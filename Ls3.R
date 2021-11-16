@@ -34,3 +34,55 @@ g3 = ggplot(data = InsectSprays, aes(y = count, x = spray, fill  = spray))
 g3 = g3 + geom_violin(colour = "black", size = 2)
 g3 = g3 + xlab("Type of spray") + ylab("Insect count")
 g3
+
+summary(lm(count ~ spray, data = InsectSprays))$coef
+
+summary(lm(count ~ 
+             I(1 * (spray == 'B')) + I(1 * (spray == 'C')) + 
+             I(1 * (spray == 'D')) + I(1 * (spray == 'E')) +
+             I(1 * (spray == 'F'))
+           , data = InsectSprays))$coef
+
+summary(lm(count ~ 
+             I(1 * (spray == 'B')) + I(1 * (spray == 'C')) +  
+             I(1 * (spray == 'D')) + I(1 * (spray == 'E')) +
+             I(1 * (spray == 'F')) + I(1 * (spray == 'A')), data = InsectSprays))$coef
+summary(lm(count ~ spray - 1, data = InsectSprays))$coef
+library(dplyr)
+summarise(group_by(InsectSprays, spray), mn = mean(count))
+
+spray2 <- relevel(InsectSprays$spray, "C")
+summary(lm(count ~ spray2, data = InsectSprays))$coef
+
+
+data(swiss)
+head(swiss)
+library(dplyr); 
+swiss = mutate(swiss, CatholicBin = 1 * (Catholic > 50))
+g4 = ggplot(swiss, aes(x = Agriculture, y = Fertility, colour = factor(CatholicBin)))
+g4 = g4 + geom_point(size = 6, colour = "black") + geom_point(size = 4)
+g4 = g4 + xlab("% in Agriculture") + ylab("Fertility")
+g4
+
+summary(lm(Fertility ~ Agriculture, data = swiss))$coef
+
+fit = lm(Fertility ~ Agriculture, data = swiss)
+g5_1 = g4
+g5_1 = g5_1 + geom_abline(intercept = coef(fit)[1], slope = coef(fit)[2], size = 2)
+g5_1
+summary(fit)
+
+fit = lm(Fertility ~ Agriculture + factor(CatholicBin), data = swiss)
+g5_2 = g4
+g5_2 = g5_2 + geom_abline(intercept = coef(fit)[1], slope = coef(fit)[2], size = 2)
+g5_2 = g5_2 + geom_abline(intercept = coef(fit)[1] + coef(fit)[3], slope = coef(fit)[2], size = 2)
+g5_2
+summary(fit)
+
+fit = lm(Fertility ~ Agriculture * factor(CatholicBin), data = swiss)
+g5_3 = g4
+g5_3 = g5_3 + geom_abline(intercept = coef(fit)[1], slope = coef(fit)[2], size = 2)
+g5_3 = g5_3 + geom_abline(intercept = coef(fit)[1] + coef(fit)[3], 
+                      slope = coef(fit)[2] + coef(fit)[4], size = 2)
+g5_3
+
